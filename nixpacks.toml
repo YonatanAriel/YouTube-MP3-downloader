@@ -1,0 +1,6 @@
+[pkgs]
+python3 = "3.11"
+ffmpeg = "latest"
+
+[[pkgs]]
+yt-dlp = "latest"
