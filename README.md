@@ -1,4 +1,4 @@
-# Melodl — YouTube MP3 Downloader
+# Melodl - YouTube MP3 Downloader
 
 A premium, lightweight, self-hosted web application to download high-quality MP3 audio from YouTube videos. 
 
