@@ -1,6 +1,7 @@
 import type { VideoResult, SearchResponse } from './types';
 
-const API_BASE = '/api';
+const API_URL = import.meta.env.VITE_API_URL || '';
+const API_BASE = API_URL ? `${API_URL}/api` : '/api';
 
 export async function searchVideos(query: string): Promise<VideoResult[]> {
   const res = await fetch(`${API_BASE}/search?q=${encodeURIComponent(query)}`);

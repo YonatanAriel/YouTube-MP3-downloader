@@ -81,3 +81,5 @@ test*.mp3
 *.pid
 *.seed
 *.pid.lock
+
+.env*
