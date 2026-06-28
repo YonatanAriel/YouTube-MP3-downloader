@@ -70,8 +70,15 @@ app.get('/api/search', async (req, res) => {
     ];
 
     // Add WARP proxy if available
-    if (WARP_PROXY) {
-      args.push('--proxy', WARP_PROXY);
+    // Try multiple WARP endpoints as fallback
+    const warpEndpoints = [
+      WARP_PROXY,
+      'socks5h://warp.cloudflare.com:1080',
+      'socks5h://127.0.0.1:40000',
+    ].filter(Boolean);
+
+    if (warpEndpoints.length > 0) {
+      args.push('--proxy', warpEndpoints[0]);
     }
 
     const results = await runYtDlp(args);
