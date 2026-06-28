@@ -8,6 +8,11 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const app = express();
 const PORT = process.env.PORT || 3001;
 
+// WARP Proxy Configuration
+// Cloudflare WARP allows yt-dlp to bypass YouTube's datacenter IP blocking
+// by routing traffic through Cloudflare's edge network (residential-like IPs)
+const WARP_PROXY = process.env.WARP_PROXY || null;
+
 app.use(cors());
 app.use(express.json());
 
@@ -57,13 +62,20 @@ app.get('/api/search', async (req, res) => {
   }
 
   try {
-    const results = await runYtDlp([
+    const args = [
       `ytsearch10:${query.trim()}`,
       '--dump-json',
       '--flat-playlist',
       '--no-download',
       '--no-warnings',
-    ]);
+    ];
+
+    // Add WARP proxy if available
+    if (WARP_PROXY) {
+      args.push('--proxy', WARP_PROXY);
+    }
+
+    const results = await runYtDlp(args);
 
     const videos = results.map((v) => ({
       id: v.id,
@@ -95,7 +107,7 @@ app.get('/api/info', async (req, res) => {
   }
 
   try {
-    const results = await runYtDlp([
+    const args = [
       url.trim(),
       '--dump-json',
       '--no-download',
@@ -105,7 +117,14 @@ app.get('/api/info', async (req, res) => {
       '--extractor-args', 'youtube:player_client=web_safari,android',
       '--geo-bypass',
       '--no-color',
-    ]);
+    ];
+
+    // Add WARP proxy if available
+    if (WARP_PROXY) {
+      args.push('--proxy', WARP_PROXY);
+    }
+
+    const results = await runYtDlp(args);
 
     if (results.length === 0) {
       return res.status(404).json({ error: 'Video not found.' });
@@ -143,13 +162,20 @@ app.get('/api/download', async (req, res) => {
   let timeoutId;
 
   try {
-    const infoResults = await runYtDlp([
+    const infoArgs = [
       url.trim(),
       '--dump-json',
       '--no-download',
       '--no-warnings',
       '--no-playlist',
-    ]);
+    ];
+
+    // Add WARP proxy if available
+    if (WARP_PROXY) {
+      infoArgs.push('--proxy', WARP_PROXY);
+    }
+
+    const infoResults = await runYtDlp(infoArgs);
 
     if (!infoResults || infoResults.length === 0) {
       return res.status(404).json({ error: 'Video not found or not accessible.' });
@@ -184,9 +210,9 @@ app.get('/api/download', async (req, res) => {
       '--no-color',
       '--sleep-interval', '1',
       '--max-sleep-interval', '3',
+      ...(WARP_PROXY ? ['--proxy', WARP_PROXY] : []),
     ], { windowsHide: true });
 
-    let errorOccurred = false;
     let dataReceived = false;
 
     proc.stdout.on('data', (chunk) => {
@@ -197,10 +223,6 @@ app.get('/api/download', async (req, res) => {
     proc.stderr.on('data', (chunk) => {
       const msg = chunk.toString();
       console.log('[download stderr]', msg.trim());
-      
-      if (msg.includes('ERROR') || msg.includes('error') || msg.includes('Failed')) {
-        errorOccurred = true;
-      }
     });
 
     proc.on('error', (err) => {
