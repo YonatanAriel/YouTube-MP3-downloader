@@ -9,7 +9,7 @@ COPY server/package*.json ./server/
 
 RUN npm install --prefix server --ignore-scripts
 
-RUN pip3 install yt-dlp
+RUN pip3 install --break-system-packages yt-dlp
 
 COPY server ./server
 
