@@ -8,24 +8,8 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const app = express();
 const PORT = process.env.PORT || 3001;
 
-// Configure CORS to allow requests from Netlify frontend
-const corsOptions = {
-  origin: [
-    'https://melodi-downloader.netlify.app',
-    'http://localhost:5173', // local development
-    'http://localhost:3001',  // local development
-  ],
-  credentials: true,
-  methods: ['GET', 'POST', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization'],
-};
-
-app.use(cors(corsOptions));
+app.use(cors());
 app.use(express.json());
-
-// Use external WARP proxy if available
-// Or use free public WARP proxies
-const WARP_PROXY = process.env.WARP_PROXY || 'socks5h://warp.seiry.me:40000' || null;
 
 const ytDlpPath = (() => {
   return 'yt-dlp';
@@ -73,27 +57,13 @@ app.get('/api/search', async (req, res) => {
   }
 
   try {
-    const args = [
+    const results = await runYtDlp([
       `ytsearch10:${query.trim()}`,
       '--dump-json',
       '--flat-playlist',
       '--no-download',
       '--no-warnings',
-    ];
-
-    // Add WARP proxy if available
-    // Try multiple WARP endpoints as fallback
-    const warpEndpoints = [
-      WARP_PROXY,
-      'socks5h://warp.cloudflare.com:1080',
-      'socks5h://127.0.0.1:40000',
-    ].filter(Boolean);
-
-    if (warpEndpoints.length > 0) {
-      args.push('--proxy', warpEndpoints[0]);
-    }
-
-    const results = await runYtDlp(args);
+    ]);
 
     const videos = results.map((v) => ({
       id: v.id,
@@ -125,24 +95,13 @@ app.get('/api/info', async (req, res) => {
   }
 
   try {
-    const args = [
+    const results = await runYtDlp([
       url.trim(),
       '--dump-json',
       '--no-download',
       '--no-warnings',
       '--no-playlist',
-      '--user-agent', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
-      '--extractor-args', 'youtube:player_client=web_safari,android',
-      '--geo-bypass',
-      '--no-color',
-    ];
-
-    // Add WARP proxy if available
-    if (WARP_PROXY) {
-      args.push('--proxy', WARP_PROXY);
-    }
-
-    const results = await runYtDlp(args);
+    ]);
 
     if (results.length === 0) {
       return res.status(404).json({ error: 'Video not found.' });
@@ -180,20 +139,13 @@ app.get('/api/download', async (req, res) => {
   let timeoutId;
 
   try {
-    const infoArgs = [
+    const infoResults = await runYtDlp([
       url.trim(),
       '--dump-json',
       '--no-download',
       '--no-warnings',
       '--no-playlist',
-    ];
-
-    // Add WARP proxy if available
-    if (WARP_PROXY) {
-      infoArgs.push('--proxy', WARP_PROXY);
-    }
-
-    const infoResults = await runYtDlp(infoArgs);
+    ]);
 
     if (!infoResults || infoResults.length === 0) {
       return res.status(404).json({ error: 'Video not found or not accessible.' });
@@ -228,7 +180,6 @@ app.get('/api/download', async (req, res) => {
       '--no-color',
       '--sleep-interval', '1',
       '--max-sleep-interval', '3',
-      ...(WARP_PROXY ? ['--proxy', WARP_PROXY] : []),
     ], { windowsHide: true });
 
     let dataReceived = false;
