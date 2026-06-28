@@ -101,6 +101,9 @@ app.get('/api/info', async (req, res) => {
       '--no-download',
       '--no-warnings',
       '--no-playlist',
+      '--user-agent', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+      '--geo-bypass',
+      '--no-color',
     ]);
 
     if (results.length === 0) {
