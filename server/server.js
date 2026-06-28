@@ -11,14 +11,7 @@ const PORT = process.env.PORT || 3001;
 app.use(cors());
 app.use(express.json());
 
-const ytDlpPath = await (async () => {
-  try {
-    const mod = await import('youtube-dl-exec');
-    if (mod.default?.constants?.YOUTUBE_DL_PATH) return mod.default.constants.YOUTUBE_DL_PATH;
-    if (mod.default?.path) return mod.default.path;
-  } catch (e) {
-    console.warn('Fallback to system yt-dlp:', e.message);
-  }
+const ytDlpPath = (() => {
   return 'yt-dlp';
 })();
 
