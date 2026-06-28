@@ -102,6 +102,7 @@ app.get('/api/info', async (req, res) => {
       '--no-warnings',
       '--no-playlist',
       '--user-agent', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+      '--extractor-args', 'youtube:player_client=web_safari,android',
       '--geo-bypass',
       '--no-color',
     ]);
@@ -175,12 +176,14 @@ app.get('/api/download', async (req, res) => {
       '--no-mtime',
       '--socket-timeout', '30',
       '--fragment-retries', '10',
-      '--extractor-args', 'youtube:skip=dash,hls,translated_subs',
+      '--extractor-args', 'youtube:player_client=web_safari,android;skip=dash,hls,translated_subs',
       '--no-check-certificate',
       '-f', 'bestaudio[ext=m4a]/bestaudio',
       '--user-agent', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
       '--geo-bypass',
       '--no-color',
+      '--sleep-interval', '1',
+      '--max-sleep-interval', '3',
     ], { windowsHide: true });
 
     let errorOccurred = false;
