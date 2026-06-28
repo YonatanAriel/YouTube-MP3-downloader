@@ -8,7 +8,19 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const app = express();
 const PORT = process.env.PORT || 3001;
 
-app.use(cors());
+// Configure CORS to allow requests from Netlify frontend
+const corsOptions = {
+  origin: [
+    'https://melodi-downloader.netlify.app',
+    'http://localhost:5173', // local development
+    'http://localhost:3001',  // local development
+  ],
+  credentials: true,
+  methods: ['GET', 'POST', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+};
+
+app.use(cors(corsOptions));
 app.use(express.json());
 
 // Use external WARP proxy if available
