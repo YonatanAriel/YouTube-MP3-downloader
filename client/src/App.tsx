@@ -163,7 +163,7 @@ export default function App() {
             Melodl
           </h1>
           <p style={{ color: 'var(--text-secondary)', marginTop: '0.5rem', fontSize: '1.1rem' }}>
-            High-quality YouTube MP3 Downloader
+            High-quality Audio Downloader
           </p>
         </header>
 
@@ -172,7 +172,7 @@ export default function App() {
             <input
               ref={searchInputRef}
               type="text"
-              placeholder="Paste YouTube Link or Search Query..."
+              placeholder="Paste Link or Search Query..."
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               disabled={loadingState !== 'idle'}
@@ -373,7 +373,7 @@ export default function App() {
         )}
 
         <footer style={{ marginTop: 'auto', textAlign: 'center', fontSize: '0.8rem', color: 'var(--text-muted)' }}>
-          <span>Melodl YouTube MP3 Downloader • Personal Use Only</span>
+          <span>Melodl Audio Downloader • Personal Use Only</span>
         </footer>
 
       </main>
