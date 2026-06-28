@@ -1,0 +1,5 @@
+FROM seiry/cloudflare-warp-proxy:latest
+
+EXPOSE 40000
+
+# The image automatically starts WARP, no CMD needed

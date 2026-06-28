@@ -1,0 +1,28 @@
+services:
+  # Cloudflare WARP proxy service
+  - type: web
+    name: melodl-warp-proxy
+    runtime: docker
+    dockerfilePath: ./Dockerfile.warp
+    port: 40000
+    autoDeploy: true
+    restart: always
+    envVars:
+      - key: TZ
+        value: UTC
+
+  # Backend API service
+  - type: web
+    name: melodl-backend
+    runtime: docker
+    dockerfilePath: ./Dockerfile
+    port: 3001
+    autoDeploy: true
+    restart: always
+    envVars:
+      - key: PORT
+        value: "3001"
+      - key: WARP_PROXY
+        value: "socks5h://melodl-warp-proxy:40000"
+    depends_on:
+      - melodl-warp-proxy
