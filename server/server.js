@@ -8,13 +8,12 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const app = express();
 const PORT = process.env.PORT || 3001;
 
-// WARP Proxy Configuration
-// Cloudflare WARP allows yt-dlp to bypass YouTube's datacenter IP blocking
-// by routing traffic through Cloudflare's edge network (residential-like IPs)
-const WARP_PROXY = process.env.WARP_PROXY || null;
-
 app.use(cors());
 app.use(express.json());
+
+// Use external WARP proxy if available
+// Or use free public WARP proxies
+const WARP_PROXY = process.env.WARP_PROXY || 'socks5h://warp.seiry.me:40000' || null;
 
 const ytDlpPath = (() => {
   return 'yt-dlp';
