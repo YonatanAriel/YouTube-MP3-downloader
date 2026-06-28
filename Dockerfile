@@ -1,6 +1,6 @@
 FROM node:20-alpine
 
-RUN apk add --no-cache python3 ffmpeg
+RUN apk add --no-cache python3 py3-pip ffmpeg
 
 WORKDIR /app
 
@@ -9,7 +9,7 @@ COPY server/package*.json ./server/
 
 RUN npm install --prefix server --ignore-scripts
 
-RUN npm install -g yt-dlp
+RUN pip3 install yt-dlp
 
 COPY server ./server
 
